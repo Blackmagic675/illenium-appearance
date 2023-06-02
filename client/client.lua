@@ -75,6 +75,11 @@ AddEventHandler("onResourceStart", function(resource)
     if resource == GetCurrentResourceName() then
         InitAppearance()
     end
+    --TriggerEvent("backitems:displayItems", false)
+    TriggerEvent('cortex_backitems:DeleteAttachedBackItems')
+    Wait(100)
+    --TriggerEvent("backitems:displayItems", true)
+    TriggerEvent('cortex_backitems:AttachBackItems') 
 end)
 
 local function getNewCharacterConfig()
@@ -107,8 +112,11 @@ function InitializeCharacter(gender, onSubmit, onCancel)
     SetInitialClothes(Config.InitialPlayerClothes[gender])
     local config = getNewCharacterConfig()
     TriggerServerEvent("illenium-appearance:server:ChangeRoutingBucket")
+    --TriggerEvent("backitems:displayItems", false)
+    TriggerEvent('cortex_backitems:DeleteAttachedBackItems')
     client.startPlayerCustomization(function(appearance)
         if (appearance) then
+            TriggerEvent("3H-Cutscene:client:StartCutscene") -->> Start 3H-Cutscene
             TriggerServerEvent("illenium-appearance:server:saveAppearance", appearance)
             if onSubmit then
                 onSubmit()
@@ -118,10 +126,14 @@ function InitializeCharacter(gender, onSubmit, onCancel)
         end
         Framework.CachePed()
         TriggerServerEvent("illenium-appearance:server:ResetRoutingBucket")
+        --TriggerEvent("backitems:displayItems", true)
+        TriggerEvent('cortex_backitems:AttachBackItems') 
     end, config)
 end
 
 function OpenShop(config, isPedMenu, shopType)
+    --TriggerEvent("backitems:displayItems", false)
+    TriggerEvent('cortex_backitems:DeleteAttachedBackItems')
     lib.callback("illenium-appearance:server:hasMoney", false, function(hasMoney, money)
         if not hasMoney and not isPedMenu then
             lib.notify({
@@ -148,6 +160,8 @@ function OpenShop(config, isPedMenu, shopType)
                 })
             end
             Framework.CachePed()
+            --TriggerEvent("backitems:displayItems", true)
+            TriggerEvent('cortex_backitems:AttachBackItems')
         end, config)
     end, shopType)
 end
@@ -681,6 +695,39 @@ RegisterNetEvent("illenium-appearance:client:changeOutfit", function(data)
         end
         Framework.CachePed()
     end
+    ---- Setup to check vehicles near by ----
+    local ped = GetPlayerPed(-1) -- Get the player ped
+    local coords = GetEntityCoords(ped) -- Get the coordinates of the ped
+    local vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, 5.0, 0, 71) -- Get the closest vehicle to the ped within a radius of 5.0 units
+    local doorIndex = 5
+
+    ---- Setup of animation ----
+    local animDict = "mp_clothing@female@shirt"
+    local animName = "try_shirt_positive_a"
+    local duration = 5000
+
+    if DoesEntityExist(vehicle) then
+        local vehicleCoords = GetEntityCoords(vehicle)
+        local doorState = GetVehicleDoorAngleRatio(vehicle, doorIndex)
+
+        TriggerEvent('animations:client:EmoteCommandStart', {"c"})
+        if doorState ~= 0 then
+            SetVehicleDoorShut(vehicle, doorIndex, false)
+        end
+    end
+
+    RequestAnimDict(animDict)
+    while not HasAnimDictLoaded(animDict) do
+        Citizen.Wait(0)
+    end
+
+    TaskPlayAnim(ped, animDict, animName, 8.0, -8.0, duration, 0, 0, false, false, false)
+
+    TriggerEvent("backitems:displayItems", false)
+    --TriggerEvent('cortex_backitems:DeleteAttachedBackItems')
+    Wait(100)
+    --TriggerEvent("backitems:displayItems", true)
+    TriggerEvent('cortex_backitems:AttachBackItems') 
 end)
 
 RegisterNetEvent("illenium-appearance:client:DeleteManagementOutfit", function(id)
@@ -735,6 +782,11 @@ RegisterNetEvent("illenium-appearance:client:reloadSkin", function(bypassChecks)
         end
         RestorePlayerStats()
     end)
+    --TriggerEvent("backitems:displayItems", false)
+    TriggerEvent('cortex_backitems:DeleteAttachedBackItems')
+    Wait(100)
+    --TriggerEvent("backitems:displayItems", true)
+    TriggerEvent('cortex_backitems:AttachBackItems') 
 end)
 
 RegisterNetEvent("illenium-appearance:client:ClearStuckProps", function()
@@ -757,4 +809,9 @@ RegisterNetEvent("illenium-appearance:client:ClearStuckProps", function()
         DeleteEntity(v)
       end
     end
+    --TriggerEvent("backitems:displayItems", false)
+    TriggerEvent('cortex_backitems:DeleteAttachedBackItems')
+    Wait(100)
+    --TriggerEvent("backitems:displayItems", true)
+    TriggerEvent('cortex_backitems:AttachBackItems')
 end)
