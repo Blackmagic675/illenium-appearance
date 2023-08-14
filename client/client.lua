@@ -719,8 +719,8 @@ RegisterNetEvent("illenium-appearance:client:changeOutfit", function(data)
 
     TaskPlayAnim(ped, animDict, animName, 8.0, -8.0, duration, 0, 0, false, false, false)
 
-    TriggerEvent("backitems:displayItems", false)
-    --TriggerEvent('cortex_backitems:DeleteAttachedBackItems')
+    --TriggerEvent("backitems:displayItems", false)
+    TriggerEvent('cortex_backitems:DeleteAttachedBackItems')
     Wait(100)
     --TriggerEvent("backitems:displayItems", true)
     TriggerEvent('cortex_backitems:AttachBackItems') 
